@@ -39,6 +39,7 @@ export function HeroGlobe() {
         { location: [40.7128, -74.0060], size: 0.05 },     // New York
         { location: [51.5072, -0.1276], size: 0.04 },      // London
       ],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onRender: (state: any) => {
         if (!pointerInteracting.current) {
           phi += 0.002;
@@ -47,6 +48,7 @@ export function HeroGlobe() {
         state.width = width * 2;
         state.height = width * 2;
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
     setTimeout(() => (canvasRef.current!.style.opacity = "1"));
