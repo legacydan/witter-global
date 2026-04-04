@@ -2,26 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-navy: #0B1D3A;
+    --color-gold: #B8924A;
+    --color-cream: #FAF8F5;
+    --color-text: #1A2D42;
+    --color-text-secondary: #5B7BA7;
+    --color-border: #E5DDD1;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    color: var(--color-text);
+    background-color: var(--color-cream);
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-cormorant), Georgia, serif;
+    color: var(--color-navy);
+  }
+
+  ::selection {
+    background-color: #B8924A33;
+    color: var(--color-navy);
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .section-padding {
+    @apply px-6 sm:px-8 lg:px-12;
+  }
+
+  .section-spacing {
+    @apply py-20 sm:py-24 lg:py-30;
+  }
+
+  .content-width {
+    @apply max-w-content mx-auto;
+  }
+
+  .gold-rule {
+    @apply w-16 h-[2px] bg-gold-500;
+  }
+
+  .gold-rule-center {
+    @apply w-16 h-[2px] bg-gold-500 mx-auto;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
+  .animate-on-scroll {
+    opacity: 0;
+  }
+
+  .animate-on-scroll.is-visible {
+    animation: fadeInUp 0.7s ease-out forwards;
+  }
+}
+
+/* Subtle noise texture overlay for depth */
+.noise-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
 }
