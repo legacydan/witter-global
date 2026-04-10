@@ -22,8 +22,9 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-body-sm leading-relaxed text-white/60 max-w-xs">
-              A South Florida management and holdings company overseeing a
-              portfolio of established retail and corporate entities.
+              Professional management, consulting, and operational support
+              designed to help businesses scale efficiently and operate at a
+              higher level.
             </p>
           </div>
 
@@ -57,24 +58,16 @@ export default function Footer() {
             </h3>
             <address className="not-italic space-y-3 text-body-sm text-white/60">
               <p>
-                1830 N. University Dr. Ste 211
+                1830 N. University Dr. Ste #211
                 <br />
                 Plantation, FL 33322
               </p>
               <p>
                 <a
-                  href="tel:+19548164669"
+                  href="mailto:info@witterglobal.com"
                   className="hover:text-gold-300 transition-colors duration-200"
                 >
-                  (954) 816-4669
-                </a>
-              </p>
-              <p>
-                <a
-                  href="mailto:info@wittergloballlc.com"
-                  className="hover:text-gold-300 transition-colors duration-200"
-                >
-                  info@wittergloballlc.com
+                  info@witterglobal.com
                 </a>
               </p>
             </address>

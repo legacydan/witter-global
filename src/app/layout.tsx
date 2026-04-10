@@ -20,23 +20,25 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Witter Global LLC — Management & Holdings",
+    default: "Witter Global LLC — Strategic Business Management & Growth Solutions",
     template: "%s | Witter Global LLC",
   },
   description:
-    "Witter Global LLC is a South Florida management and holdings company overseeing a portfolio of established retail and corporate entities.",
+    "Witter Global provides professional management, consulting, and operational support services designed to help businesses scale efficiently and operate at a higher level.",
   keywords: [
     "Witter Global",
-    "management company",
-    "holdings company",
-    "South Florida",
-    "Plantation FL",
+    "business management",
     "business consulting",
+    "operational consulting",
+    "business development",
+    "administrative support",
+    "Plantation FL",
+    "South Florida",
   ],
   openGraph: {
-    title: "Witter Global LLC — Management & Holdings",
+    title: "Witter Global LLC — Strategic Business Management & Growth Solutions",
     description:
-      "Strategic management and holdings company based in South Florida.",
+      "Professional management, consulting, and operational support services designed to help businesses scale efficiently.",
     type: "website",
     locale: "en_US",
     siteName: "Witter Global LLC",
