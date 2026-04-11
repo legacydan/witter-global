@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Environment, ContactShadows, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
-/* ─── Decorative sparkle (unchanged) ─── */
+/* ─── Decorative sparkle ─── */
 function Sparkle({
   position,
   scale = 1,
@@ -45,11 +45,11 @@ function Sparkle({
   );
 }
 
-/* ─── The Globe + Upward Gold Arrow ─── */
+/* ─── Globe + Gold Arrow wrapping around the globe finishing upward ─── */
 function LogoGeometry() {
   const groupRef = useRef<THREE.Group>(null);
 
-  // Gentle auto-rotate with a subtle sway
+  // Gentle auto-rotate + sway
   useFrame((state) => {
     if (groupRef.current) {
       groupRef.current.rotation.y = state.clock.elapsedTime * 0.1;
@@ -57,32 +57,55 @@ function LogoGeometry() {
     }
   });
 
-  /* Gold PBR material shared by every arrow piece for a consistent finish */
-  const goldMaterial = (
-    <meshPhysicalMaterial
-      color="#D4AF37"
-      metalness={1}
-      roughness={0.12}
-      clearcoat={1}
-      clearcoatRoughness={0.08}
-    />
-  );
+  /**
+   * Build the curved path for the arrow.
+   *
+   * The arrow starts low on the front-right of the globe, sweeps down
+   * and under, wraps around the BACK of the globe, cresting over the
+   * top and straightening into a vertical finish so the arrowhead
+   * points straight up at the sky.
+   */
+  const { tubeGeometry, coneQuaternion, conePosition } = useMemo(() => {
+    // Control points traced in order along the path
+    const points: THREE.Vector3[] = [
+      new THREE.Vector3(1.4, -0.9, 0.9),   // start: front-right, below equator
+      new THREE.Vector3(0.6, -1.5, 0.3),   // dips under-right
+      new THREE.Vector3(-0.6, -1.4, -0.4), // under-back
+      new THREE.Vector3(-1.5, -0.4, -0.8), // back-left, rising
+      new THREE.Vector3(-1.4, 0.7, -1.0),  // upper-back-left
+      new THREE.Vector3(-0.4, 1.4, -1.1),  // cresting top-back
+      new THREE.Vector3(0.7, 1.6, -0.6),   // top-back-right
+      new THREE.Vector3(1.2, 1.8, 0.1),    // swinging forward
+      new THREE.Vector3(1.1, 2.2, 0.4),    // straightening
+      new THREE.Vector3(1.0, 2.6, 0.5),    // nearly vertical
+      new THREE.Vector3(1.0, 3.0, 0.5),    // final — tangent points straight up
+    ];
 
-  /* Arrow dimensions (upward-pointing) */
-  const shaftHeight = 2.6;
-  const shaftRadius = 0.13;
-  const headHeight = 0.85;
-  const headRadius = 0.38;
+    const curve = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
 
-  // Shaft center so its bottom sits just inside the top of the globe
-  // Globe radius = 1.2, shaft half = 1.3 → shaft bottom at y ≈ 0.2 (below globe top for anchor look)
-  const shaftCenterY = 0.2 + shaftHeight / 2; // 1.5
-  const shaftTopY = shaftCenterY + shaftHeight / 2; // 2.8
-  const headCenterY = shaftTopY + headHeight / 2; // 3.225
+    // Tube geometry — the main arrow shaft wrapping around the globe
+    const tubeGeometry = new THREE.TubeGeometry(curve, 220, 0.12, 20, false);
+
+    // Cone (arrowhead) — align it with the curve's tangent at the end
+    const endTangent = curve.getTangentAt(1).normalize();
+    const endPoint = curve.getPointAt(1);
+    const up = new THREE.Vector3(0, 1, 0);
+    const coneQuaternion = new THREE.Quaternion().setFromUnitVectors(
+      up,
+      endTangent
+    );
+
+    // Offset the cone so its BASE sits at the end of the tube
+    const coneHeight = 0.7;
+    const coneOffset = endTangent.clone().multiplyScalar(coneHeight / 2);
+    const conePosition = endPoint.clone().add(coneOffset);
+
+    return { tubeGeometry, coneQuaternion, conePosition };
+  }, []);
 
   return (
     <group ref={groupRef}>
-      {/* 1. The Central Globe */}
+      {/* 1. Central Globe */}
       <mesh>
         <sphereGeometry args={[1.2, 64, 64]} />
         <meshPhysicalMaterial
@@ -94,7 +117,7 @@ function LogoGeometry() {
         />
       </mesh>
 
-      {/* Grid wrapper for the globe (subtle lat/long shimmer) */}
+      {/* Subtle wireframe lat/long shimmer */}
       <mesh>
         <sphereGeometry args={[1.205, 32, 32]} />
         <meshBasicMaterial
@@ -105,49 +128,33 @@ function LogoGeometry() {
         />
       </mesh>
 
-      {/* 2. The Golden Upward Arrow — tilted forward slightly for dynamism */}
-      <group rotation={[-Math.PI / 14, 0, Math.PI / 28]}>
-        {/* Shaft */}
-        <mesh position={[0, shaftCenterY, 0]}>
-          <cylinderGeometry
-            args={[shaftRadius, shaftRadius, shaftHeight, 48]}
-          />
-          {goldMaterial}
-        </mesh>
+      {/* 2. Gold Arrow Shaft — wraps around the globe */}
+      <mesh geometry={tubeGeometry}>
+        <meshPhysicalMaterial
+          color="#D4AF37"
+          metalness={1}
+          roughness={0.12}
+          clearcoat={1}
+          clearcoatRoughness={0.08}
+        />
+      </mesh>
 
-        {/* Arrowhead (cone points up by default in three.js) */}
-        <mesh position={[0, headCenterY, 0]}>
-          <coneGeometry args={[headRadius, headHeight, 48]} />
-          {goldMaterial}
-        </mesh>
+      {/* 3. Arrowhead — sits at the end of the curve, pointing up */}
+      <mesh position={conePosition} quaternion={coneQuaternion}>
+        <coneGeometry args={[0.32, 0.7, 40]} />
+        <meshPhysicalMaterial
+          color="#D4AF37"
+          metalness={1}
+          roughness={0.1}
+          clearcoat={1}
+          clearcoatRoughness={0.08}
+        />
+      </mesh>
 
-        {/* Decorative collar where shaft meets globe — hides the entry point */}
-        <mesh position={[0, 0.35, 0]}>
-          <torusGeometry args={[0.22, 0.05, 16, 48]} />
-          <meshPhysicalMaterial
-            color="#D4AF37"
-            metalness={1}
-            roughness={0.18}
-            clearcoat={1}
-            clearcoatRoughness={0.1}
-          />
-        </mesh>
-
-        {/* Subtle secondary highlight cone behind the main tip for depth */}
-        <mesh position={[0, headCenterY, -0.01]} scale={[0.95, 0.95, 0.95]}>
-          <coneGeometry args={[headRadius, headHeight, 48]} />
-          <meshStandardMaterial
-            color="#B8924A"
-            metalness={1}
-            roughness={0.3}
-          />
-        </mesh>
-      </group>
-
-      {/* 3. Sparkles scattered near the arrow tip */}
-      <Sparkle position={[0.9, 2.8, 0.2]} scale={0.08} />
-      <Sparkle position={[-0.7, 3.1, -0.1]} scale={0.05} />
-      <Sparkle position={[0.4, 2.4, 0.5]} scale={0.04} />
+      {/* 4. Sparkles near the arrow tip */}
+      <Sparkle position={[1.6, 3.1, 0.6]} scale={0.08} />
+      <Sparkle position={[0.5, 3.3, 0.2]} scale={0.05} />
+      <Sparkle position={[1.9, 2.5, 0.4]} scale={0.04} />
     </group>
   );
 }
@@ -155,10 +162,10 @@ function LogoGeometry() {
 export function WitterCustomLogo3D() {
   return (
     <div className="w-full h-full min-h-[500px] lg:min-h-[700px] flex items-center justify-center relative cursor-grab active:cursor-grabbing">
-      <Canvas camera={{ position: [0, 1.2, 6.2], fov: 45 }}>
-        <fog attach="fog" args={["#0B1D3A", 6, 18]} />
+      <Canvas camera={{ position: [0.3, 0.8, 7], fov: 45 }}>
+        <fog attach="fog" args={["#0B1D3A", 7, 20]} />
 
-        {/* Lighting optimized to reflect beautifully against metallic gold */}
+        {/* Lighting optimized for metallic gold */}
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 10, 5]} intensity={1.6} color="#ffffff" />
         <directionalLight position={[-5, -10, -5]} intensity={0.5} color="#4A90E2" />
@@ -171,7 +178,7 @@ export function WitterCustomLogo3D() {
         </Float>
 
         <ContactShadows
-          position={[0, -1.6, 0]}
+          position={[0, -1.8, 0]}
           opacity={0.4}
           scale={10}
           blur={2}
