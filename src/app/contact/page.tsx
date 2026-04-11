@@ -1,3 +1,4 @@
+import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export const metadata = {
@@ -12,6 +13,14 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-navy-900 to-navy" />
         <div className="relative content-width section-padding text-center">
           <ScrollReveal>
+            <Image
+              src="/assets/witter-global-logo.png"
+              alt="Witter Global LLC"
+              width={560}
+              height={548}
+              className="h-24 sm:h-28 w-auto mx-auto mb-6 drop-shadow-[0_6px_20px_rgba(0,0,0,0.45)]"
+              priority
+            />
             <div className="gold-rule-center mb-6" />
             <h1 className="font-heading font-semibold text-display-sm sm:text-display text-white mb-6 drop-shadow-lg">
               Contact Witter Global

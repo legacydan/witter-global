@@ -41,19 +41,20 @@ export default function Navbar() {
             <Image
               src="/assets/witter-global-logo.png"
               alt="Witter Global LLC"
-              width={44}
-              height={44}
-              className={`h-10 w-10 object-contain transition-all duration-300 ${scrolled ? "drop-shadow-sm" : "brightness-0 invert drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]"}`}
+              width={560}
+              height={548}
+              className="h-11 lg:h-12 w-auto object-contain transition-all duration-300 drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)] group-hover:scale-[1.03]"
               priority
             />
-            <div className="flex flex-col">
-              <span className={`font-heading text-lg lg:text-xl font-bold tracking-wide leading-tight transition-colors duration-300 ${scrolled ? "text-navy" : "text-white"}`}>
-                Witter Global
-              </span>
-              <span className={`text-[0.625rem] font-body font-semibold tracking-[0.2em] uppercase transition-colors duration-300 ${scrolled ? "text-navy-500" : "text-gold-400"}`}>
-                LLC
-              </span>
-            </div>
+            <span
+              className={`hidden sm:inline-flex items-center text-[0.6875rem] font-body font-bold tracking-[0.25em] uppercase px-2 py-1 rounded-full border transition-all duration-300 ${
+                scrolled
+                  ? "text-navy-500 border-navy-100 bg-navy-50/40"
+                  : "text-gold-300 border-gold-400/40 bg-white/5 backdrop-blur-sm"
+              }`}
+            >
+              LLC
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

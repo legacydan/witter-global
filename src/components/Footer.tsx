@@ -9,16 +9,16 @@ export default function Footer() {
         <div className="py-16 lg:py-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link href="/" className="inline-flex items-center gap-3 mb-5">
+            <Link href="/" className="inline-flex items-center gap-3 mb-6">
               <Image
                 src="/assets/witter-global-logo.png"
                 alt="Witter Global LLC"
-                width={36}
-                height={36}
-                className="h-9 w-9 object-contain brightness-0 invert opacity-90"
+                width={560}
+                height={548}
+                className="h-16 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]"
               />
-              <span className="font-heading text-lg font-semibold text-white tracking-wide">
-                Witter Global
+              <span className="text-[0.6875rem] font-body font-bold tracking-[0.25em] uppercase px-2 py-1 rounded-full border border-gold-400/40 text-gold-300 bg-white/5 backdrop-blur-sm">
+                LLC
               </span>
             </Link>
             <p className="text-body-sm leading-relaxed text-white/60 max-w-xs">

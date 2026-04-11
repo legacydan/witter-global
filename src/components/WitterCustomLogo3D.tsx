@@ -58,33 +58,47 @@ function LogoGeometry() {
   });
 
   /**
-   * Build the arrow as a pure helix wrapping the globe. The spiral path
-   * parallels the globe surface at a constant offset (so it actually hugs
-   * the sphere instead of drifting off at the poles), wraps 1.5 times,
-   * and terminates near the top of the globe. The arrowhead is placed
-   * AT the natural end of the helix — there is no extension, no bend,
-   * no directional change. The cone's orientation is whatever the
-   * helix's natural tangent is at its final point.
+   * Build the arrow as a helix that smoothly "lands" horizontally at
+   * the top and finishes pointing straight outward.
+   *
+   * Uses a single continuous parameterization:
+   *   y(t) = bottomY + (topY - bottomY) * g(t)
+   *   θ(t) = totalTurns * 2π * g(t)
+   *   r(t) = (globe surface radius at y) + offset + extension * h(t)
+   *
+   * Where:
+   *   g(t) = t + t² - t³   — linear-ish but g'(1) = 0, so as t → 1
+   *                          the spiral stops climbing AND stops rotating.
+   *   h(t) = t⁵            — stays near 0 for most of the path so the
+   *                          spiral hugs the globe, then grows rapidly
+   *                          near t=1 with h'(1) = 5. Because this is
+   *                          the ONLY velocity source at t=1, the final
+   *                          tangent is pure radial-outward: horizontal
+   *                          and straight out. No bend.
    */
   const { tubeGeometry, coneQuaternion, conePosition } = useMemo(() => {
     const points: THREE.Vector3[] = [];
 
-    const spiralSegments = 112;
-    const globeRadius = 1.2;            // matches the actual globe sphere
-    const spiralOffset = 0.11;          // spiral parallels the surface at this gap
-    const bottomY = -1.15;              // just inside the south pole
-    const topY = 1.15;                  // just inside the north pole
-    const totalTurns = 1.5;             // 1.5 full wraps around the globe
+    const spiralSegments = 160;
+    const globeRadius = 1.2;
+    const spiralOffset = 0.11;
+    const bottomY = -1.15;
+    const topY = 1.0;                // where the arrow lands flat
+    const totalTurns = 1.5;
+    const extensionAmount = 0.55;    // how far past the globe the flat exit reaches
 
     for (let i = 0; i <= spiralSegments; i++) {
       const t = i / spiralSegments;
-      const y = bottomY + t * (topY - bottomY);
-      // Radius parallels the globe surface at constant offset.
+      const g = t + t * t - t * t * t;       // g(0)=0, g(1)=1, g'(1)=0
+      const h = t * t * t * t * t;           // h(0)=0, h(1)=1, h'(1)=5
+
+      const y = bottomY + g * (topY - bottomY);
       const surfaceR = Math.sqrt(
         Math.max(0.0001, globeRadius * globeRadius - y * y)
       );
-      const r = surfaceR + spiralOffset;
-      const angle = t * totalTurns * Math.PI * 2;
+      const r = surfaceR + spiralOffset + extensionAmount * h;
+      const angle = g * totalTurns * Math.PI * 2;
+
       points.push(
         new THREE.Vector3(r * Math.cos(angle), y, r * Math.sin(angle))
       );
@@ -93,10 +107,11 @@ function LogoGeometry() {
     const curve = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
 
     // Tube geometry — the arrow shaft wrapping around the globe
-    const tubeGeometry = new THREE.TubeGeometry(curve, 360, 0.1, 20, false);
+    const tubeGeometry = new THREE.TubeGeometry(curve, 400, 0.1, 20, false);
 
-    // Cone (arrowhead) — sits exactly at the end of the curve,
-    // oriented along the helix's natural final tangent.
+    // Cone (arrowhead) — placed at the natural end of the helix with
+    // orientation taken from the curve's final tangent. Because of the
+    // parameterization above, that tangent is horizontal radial-outward.
     const endTangent = curve.getTangentAt(1).normalize();
     const endPoint = curve.getPointAt(1);
     const up = new THREE.Vector3(0, 1, 0);
