@@ -58,29 +58,28 @@ function LogoGeometry() {
   });
 
   /**
-   * Build the arrow as a true helix wrapping the globe.
+   * Build the arrow as a true helix wrapping the globe, finishing at
+   * an upward-outward angle (not straight vertical).
    *
-   * The path starts at the bottom of the globe, spirals upward while
-   * clinging to the globe surface (radius varies with latitude so the
-   * helix actually hugs the sphere), crests the top, then continues
-   * spiraling inward as it climbs into the sky — finishing with a
-   * clean vertical finish so the arrowhead points straight up.
+   * Phase 1: helix that clings to the globe from bottom to upper region.
+   *          Radius varies with latitude so it actually hugs the sphere.
+   * Phase 2: short straight-ish extension that carries the path outward
+   *          and upward at an angle, where the arrowhead sits.
    */
   const { tubeGeometry, coneQuaternion, conePosition } = useMemo(() => {
     const points: THREE.Vector3[] = [];
 
-    // Helix parameters
-    const spiralSegments = 96;          // smoothness of the spiral
-    const effectiveRadius = 1.42;       // spiral sphere radius (just outside the 1.2 globe)
-    const bottomY = -1.25;              // spiral starts just below the globe's bottom
-    const spiralTopY = 1.25;            // spiral exits just above the globe's top
-    const totalTurns = 2;               // full revolutions around the globe
+    // Helix parameters (tuned shorter than before)
+    const spiralSegments = 64;
+    const effectiveRadius = 1.42;   // spiral sphere radius (just outside the 1.2 globe)
+    const bottomY = -1.25;          // spiral starts just below the globe's bottom
+    const spiralTopY = 0.85;        // spiral exits the globe around the upper third
+    const totalTurns = 2;           // full revolutions around the globe
 
-    // 1) Spiral portion — wraps the globe from bottom to top
+    // 1) Spiral portion — hugs the globe surface from bottom to upper region
     for (let i = 0; i <= spiralSegments; i++) {
       const t = i / spiralSegments;
       const y = bottomY + t * (spiralTopY - bottomY);
-      // Horizontal radius clings to the (slightly larger) sphere
       const r = Math.sqrt(
         Math.max(0.01, effectiveRadius * effectiveRadius - y * y)
       );
@@ -90,25 +89,20 @@ function LogoGeometry() {
       );
     }
 
-    // 2) Transition — continue the spiral above the globe while tapering
-    //    radius toward 0 so the tangent straightens out vertically.
-    const lastAngle = totalTurns * Math.PI * 2;
-    const lastR = Math.sqrt(
-      Math.max(0.01, effectiveRadius * effectiveRadius - spiralTopY * spiralTopY)
-    );
-    const lastX = lastR * Math.cos(lastAngle);
-    const lastZ = lastR * Math.sin(lastAngle);
+    // 2) Angled exit — continues outward (+x) and upward (+y) at roughly
+    //    40° from vertical. The final tangent is NOT vertical, so the
+    //    arrowhead points up-and-out.
+    points.push(new THREE.Vector3(1.25, 1.05, 0.18));
+    points.push(new THREE.Vector3(1.48, 1.3, 0.08));
+    points.push(new THREE.Vector3(1.75, 1.58, 0.02));
+    points.push(new THREE.Vector3(2.0, 1.85, -0.02));
 
-    points.push(new THREE.Vector3(lastX * 0.7, 1.55, lastZ * 0.7));
-    points.push(new THREE.Vector3(lastX * 0.3, 1.9, lastZ * 0.3));
-    // Final vertical anchor — tangent here is straight up (same x/z, rising y)
-    points.push(new THREE.Vector3(0, 2.4, 0));
-    points.push(new THREE.Vector3(0, 2.9, 0));
-
-    const curve = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
+    // "chordal" parameterization handles the spacing change between the
+    // dense spiral segments and the wider exit waypoints smoothly.
+    const curve = new THREE.CatmullRomCurve3(points, false, "chordal", 0.5);
 
     // Tube geometry — the main arrow shaft wrapping around the globe
-    const tubeGeometry = new THREE.TubeGeometry(curve, 360, 0.12, 20, false);
+    const tubeGeometry = new THREE.TubeGeometry(curve, 320, 0.12, 20, false);
 
     // Cone (arrowhead) — align with the curve's tangent at the end
     const endTangent = curve.getTangentAt(1).normalize();
@@ -120,7 +114,7 @@ function LogoGeometry() {
     );
 
     // Offset the cone so its BASE sits at the end of the tube
-    const coneHeight = 0.75;
+    const coneHeight = 0.7;
     const coneOffset = endTangent.clone().multiplyScalar(coneHeight / 2);
     const conePosition = endPoint.clone().add(coneOffset);
 
@@ -163,9 +157,9 @@ function LogoGeometry() {
         />
       </mesh>
 
-      {/* 3. Arrowhead — sits at the end of the curve, pointing up */}
+      {/* 3. Arrowhead — sits at the end of the curve, angled up-and-out */}
       <mesh position={conePosition} quaternion={coneQuaternion}>
-        <coneGeometry args={[0.34, 0.75, 40]} />
+        <coneGeometry args={[0.3, 0.7, 40]} />
         <meshPhysicalMaterial
           color="#D4AF37"
           metalness={1}
@@ -176,9 +170,9 @@ function LogoGeometry() {
       </mesh>
 
       {/* 4. Sparkles near the arrow tip */}
-      <Sparkle position={[0.9, 3.3, 0.3]} scale={0.08} />
-      <Sparkle position={[-0.6, 3.2, 0.1]} scale={0.05} />
-      <Sparkle position={[0.3, 3.6, -0.2]} scale={0.04} />
+      <Sparkle position={[2.3, 2.2, 0.1]} scale={0.08} />
+      <Sparkle position={[2.6, 1.8, -0.2]} scale={0.05} />
+      <Sparkle position={[1.9, 2.5, 0.3]} scale={0.04} />
     </group>
   );
 }
