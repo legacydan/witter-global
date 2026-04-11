@@ -12,30 +12,17 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
   return (
-    <header
-      className={`fixed top-4 left-4 right-4 lg:top-6 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-4xl z-50 transition-all duration-500 rounded-full ${
-        scrolled
-          ? "bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50"
-          : "bg-white/5 backdrop-blur-md shadow-lg border border-white/20 lg:bg-[#0A1F44]/50"
-      }`}
-    >
-      <nav className="px-6 lg:px-8 py-3" aria-label="Main navigation">
-        <div className="flex items-center justify-between h-14">
+    <header className="fixed top-4 left-4 right-4 lg:top-6 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-5xl z-50 rounded-full bg-white/95 backdrop-blur-xl shadow-[0_10px_40px_-10px_rgba(11,29,58,0.25)] border border-navy-50">
+      <nav className="px-5 sm:px-6 lg:px-8 py-2" aria-label="Main navigation">
+        <div className="flex items-center justify-between h-16 lg:h-[4.5rem]">
           {/* Logo */}
           <Link href="/" className="relative z-10 flex items-center gap-3 group">
             <Image
@@ -43,22 +30,21 @@ export default function Navbar() {
               alt="Witter Global LLC"
               width={560}
               height={548}
-              className="h-11 lg:h-12 w-auto object-contain transition-all duration-300 drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)] group-hover:scale-[1.03]"
+              className="h-14 lg:h-[4.25rem] w-auto object-contain drop-shadow-[0_2px_6px_rgba(11,29,58,0.15)] group-hover:scale-[1.04] transition-transform duration-300"
               priority
             />
-            <span
-              className={`hidden sm:inline-flex items-center text-[0.6875rem] font-body font-bold tracking-[0.25em] uppercase px-2 py-1 rounded-full border transition-all duration-300 ${
-                scrolled
-                  ? "text-navy-500 border-navy-100 bg-navy-50/40"
-                  : "text-gold-300 border-gold-400/40 bg-white/5 backdrop-blur-sm"
-              }`}
-            >
-              LLC
-            </span>
+            <div className="hidden sm:flex flex-col leading-none">
+              <span className="font-heading text-lg lg:text-xl font-bold tracking-wide text-navy">
+                Witter Global
+              </span>
+              <span className="text-[0.625rem] font-body font-semibold tracking-[0.22em] uppercase text-gold-600 mt-1">
+                LLC
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <ul className="hidden md:flex items-center gap-2">
+          <ul className="hidden md:flex items-center gap-1.5">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -67,8 +53,8 @@ export default function Navbar() {
                     href={link.href}
                     className={`relative px-5 py-2.5 text-[0.8125rem] font-body font-bold tracking-[0.1em] uppercase transition-all duration-300 rounded-full ${
                       isActive
-                        ? scrolled ? "bg-navy text-white shadow-md" : "bg-white text-navy shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-                        : scrolled ? "text-navy-600 hover:bg-navy/5" : "text-white/80 hover:text-white hover:bg-white/10"
+                        ? "bg-navy text-white shadow-md"
+                        : "text-navy-600 hover:bg-navy/5"
                     }`}
                   >
                     {link.label}
@@ -87,19 +73,19 @@ export default function Navbar() {
           >
             <div className="w-6 h-5 flex flex-col justify-between">
               <span
-                className={`block h-[2.5px] transition-all duration-400 origin-center rounded-full ${
-                  scrolled || mobileOpen ? "bg-navy" : "bg-white"
-                } ${mobileOpen ? "rotate-45 translate-y-[9px]" : ""}`}
+                className={`block h-[2.5px] transition-all duration-400 origin-center rounded-full bg-navy ${
+                  mobileOpen ? "rotate-45 translate-y-[9px]" : ""
+                }`}
               />
               <span
-                className={`block h-[2.5px] transition-all duration-300 rounded-full ${
-                  scrolled || mobileOpen ? "bg-navy" : "bg-white"
-                } ${mobileOpen ? "opacity-0 scale-x-0" : ""}`}
+                className={`block h-[2.5px] transition-all duration-300 rounded-full bg-navy ${
+                  mobileOpen ? "opacity-0 scale-x-0" : ""
+                }`}
               />
               <span
-                className={`block h-[2.5px] transition-all duration-400 origin-center rounded-full ${
-                  scrolled || mobileOpen ? "bg-navy" : "bg-white"
-                } ${mobileOpen ? "-rotate-45 -translate-y-[9px]" : ""}`}
+                className={`block h-[2.5px] transition-all duration-400 origin-center rounded-full bg-navy ${
+                  mobileOpen ? "-rotate-45 -translate-y-[9px]" : ""
+                }`}
               />
             </div>
           </button>
