@@ -58,35 +58,59 @@ function LogoGeometry() {
   });
 
   /**
-   * Build the curved path for the arrow.
+   * Build the arrow as a true helix wrapping the globe.
    *
-   * The arrow starts low on the front-right of the globe, sweeps down
-   * and under, wraps around the BACK of the globe, cresting over the
-   * top and straightening into a vertical finish so the arrowhead
-   * points straight up at the sky.
+   * The path starts at the bottom of the globe, spirals upward while
+   * clinging to the globe surface (radius varies with latitude so the
+   * helix actually hugs the sphere), crests the top, then continues
+   * spiraling inward as it climbs into the sky — finishing with a
+   * clean vertical finish so the arrowhead points straight up.
    */
   const { tubeGeometry, coneQuaternion, conePosition } = useMemo(() => {
-    // Control points traced in order along the path
-    const points: THREE.Vector3[] = [
-      new THREE.Vector3(1.4, -0.9, 0.9),   // start: front-right, below equator
-      new THREE.Vector3(0.6, -1.5, 0.3),   // dips under-right
-      new THREE.Vector3(-0.6, -1.4, -0.4), // under-back
-      new THREE.Vector3(-1.5, -0.4, -0.8), // back-left, rising
-      new THREE.Vector3(-1.4, 0.7, -1.0),  // upper-back-left
-      new THREE.Vector3(-0.4, 1.4, -1.1),  // cresting top-back
-      new THREE.Vector3(0.7, 1.6, -0.6),   // top-back-right
-      new THREE.Vector3(1.2, 1.8, 0.1),    // swinging forward
-      new THREE.Vector3(1.1, 2.2, 0.4),    // straightening
-      new THREE.Vector3(1.0, 2.6, 0.5),    // nearly vertical
-      new THREE.Vector3(1.0, 3.0, 0.5),    // final — tangent points straight up
-    ];
+    const points: THREE.Vector3[] = [];
+
+    // Helix parameters
+    const spiralSegments = 96;          // smoothness of the spiral
+    const effectiveRadius = 1.42;       // spiral sphere radius (just outside the 1.2 globe)
+    const bottomY = -1.25;              // spiral starts just below the globe's bottom
+    const spiralTopY = 1.25;            // spiral exits just above the globe's top
+    const totalTurns = 2;               // full revolutions around the globe
+
+    // 1) Spiral portion — wraps the globe from bottom to top
+    for (let i = 0; i <= spiralSegments; i++) {
+      const t = i / spiralSegments;
+      const y = bottomY + t * (spiralTopY - bottomY);
+      // Horizontal radius clings to the (slightly larger) sphere
+      const r = Math.sqrt(
+        Math.max(0.01, effectiveRadius * effectiveRadius - y * y)
+      );
+      const angle = t * totalTurns * Math.PI * 2;
+      points.push(
+        new THREE.Vector3(r * Math.cos(angle), y, r * Math.sin(angle))
+      );
+    }
+
+    // 2) Transition — continue the spiral above the globe while tapering
+    //    radius toward 0 so the tangent straightens out vertically.
+    const lastAngle = totalTurns * Math.PI * 2;
+    const lastR = Math.sqrt(
+      Math.max(0.01, effectiveRadius * effectiveRadius - spiralTopY * spiralTopY)
+    );
+    const lastX = lastR * Math.cos(lastAngle);
+    const lastZ = lastR * Math.sin(lastAngle);
+
+    points.push(new THREE.Vector3(lastX * 0.7, 1.55, lastZ * 0.7));
+    points.push(new THREE.Vector3(lastX * 0.3, 1.9, lastZ * 0.3));
+    // Final vertical anchor — tangent here is straight up (same x/z, rising y)
+    points.push(new THREE.Vector3(0, 2.4, 0));
+    points.push(new THREE.Vector3(0, 2.9, 0));
 
     const curve = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
 
     // Tube geometry — the main arrow shaft wrapping around the globe
-    const tubeGeometry = new THREE.TubeGeometry(curve, 220, 0.12, 20, false);
+    const tubeGeometry = new THREE.TubeGeometry(curve, 360, 0.12, 20, false);
 
-    // Cone (arrowhead) — align it with the curve's tangent at the end
+    // Cone (arrowhead) — align with the curve's tangent at the end
     const endTangent = curve.getTangentAt(1).normalize();
     const endPoint = curve.getPointAt(1);
     const up = new THREE.Vector3(0, 1, 0);
@@ -96,7 +120,7 @@ function LogoGeometry() {
     );
 
     // Offset the cone so its BASE sits at the end of the tube
-    const coneHeight = 0.7;
+    const coneHeight = 0.75;
     const coneOffset = endTangent.clone().multiplyScalar(coneHeight / 2);
     const conePosition = endPoint.clone().add(coneOffset);
 
@@ -141,7 +165,7 @@ function LogoGeometry() {
 
       {/* 3. Arrowhead — sits at the end of the curve, pointing up */}
       <mesh position={conePosition} quaternion={coneQuaternion}>
-        <coneGeometry args={[0.32, 0.7, 40]} />
+        <coneGeometry args={[0.34, 0.75, 40]} />
         <meshPhysicalMaterial
           color="#D4AF37"
           metalness={1}
@@ -152,9 +176,9 @@ function LogoGeometry() {
       </mesh>
 
       {/* 4. Sparkles near the arrow tip */}
-      <Sparkle position={[1.6, 3.1, 0.6]} scale={0.08} />
-      <Sparkle position={[0.5, 3.3, 0.2]} scale={0.05} />
-      <Sparkle position={[1.9, 2.5, 0.4]} scale={0.04} />
+      <Sparkle position={[0.9, 3.3, 0.3]} scale={0.08} />
+      <Sparkle position={[-0.6, 3.2, 0.1]} scale={0.05} />
+      <Sparkle position={[0.3, 3.6, -0.2]} scale={0.04} />
     </group>
   );
 }
@@ -162,7 +186,7 @@ function LogoGeometry() {
 export function WitterCustomLogo3D() {
   return (
     <div className="w-full h-full min-h-[500px] lg:min-h-[700px] flex items-center justify-center relative cursor-grab active:cursor-grabbing">
-      <Canvas camera={{ position: [0.3, 0.8, 7], fov: 45 }}>
+      <Canvas camera={{ position: [0, 0.6, 7.5], fov: 45 }}>
         <fog attach="fog" args={["#0B1D3A", 7, 20]} />
 
         {/* Lighting optimized for metallic gold */}
