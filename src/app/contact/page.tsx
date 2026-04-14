@@ -26,9 +26,9 @@ export default function ContactPage() {
               Contact Witter Global
             </h1>
             <p className="text-body-lg text-white/60 max-w-2xl mx-auto font-light">
-              Have questions or ready to get started? Reach out to Witter Global
-              today. Our team is ready to assist you with professional business
-              solutions tailored to your needs.
+              For business inquiries or to learn more about our services,
+              contact Witter Global. Our team is ready to provide professional
+              support tailored to your business needs.
             </p>
           </ScrollReveal>
         </div>
@@ -46,6 +46,21 @@ export default function ContactPage() {
                   Contact Details
                 </h2>
                 <div className="space-y-8">
+                  {/* Phone */}
+                  <div>
+                    <h3 className="text-body-sm font-body font-bold tracking-widest uppercase text-navy-400 mb-2">
+                      Phone
+                    </h3>
+                    <p className="text-heading-sm font-heading text-navy">
+                      <a
+                        href="tel:0000000000"
+                        className="hover:text-gold-500 transition-colors"
+                      >
+                        (Your business number)
+                      </a>
+                    </p>
+                  </div>
+
                   {/* Email */}
                   <div>
                     <h3 className="text-body-sm font-body font-bold tracking-widest uppercase text-navy-400 mb-2">

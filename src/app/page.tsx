@@ -1,10 +1,6 @@
 import ScrollReveal from "@/components/ScrollReveal";
 
-import dynamic from "next/dynamic";
-const WitterCustomLogo3D = dynamic(
-  () => import("@/components/WitterCustomLogo3D").then((mod) => mod.WitterCustomLogo3D),
-  { ssr: false }
-);
+import Image from "next/image";
 
 /* ─── SVG Icons (inline to avoid external deps) ─── */
 function ArrowRightIcon() {
@@ -71,18 +67,18 @@ export default function HomePage() {
 
                 {/* Headline */}
                 <h1 className="font-heading font-semibold text-display-sm sm:text-display lg:text-[4.25rem] text-white text-balance mb-6 leading-[1.1] drop-shadow-lg tracking-tight">
-                  Strategic Business <br />
-                  Management &amp;{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F2E8D1] to-[#D4AF37] drop-shadow-sm animate-gradient-x">
-                    Growth Solutions.
-                  </span>
+                    Operational Excellence.
+                  </span><br />
+                  Strategic Growth. <br />
+                  Scalable Solutions.
                 </h1>
 
                 {/* Subheadline */}
                 <p className="text-body-lg text-white/70 max-w-xl mb-10 leading-relaxed font-light">
-                  Witter Global provides professional management, consulting, and
-                  operational support services designed to help businesses scale
-                  efficiently and operate at a higher level.
+                  Witter Global is a business management and consulting firm specializing
+                  in operational infrastructure, administrative support, and strategic
+                  development for growing companies.
                 </p>
 
                 {/* CTA */}
@@ -106,9 +102,22 @@ export default function HomePage() {
               </ScrollReveal>
             </div>
 
-            {/* Right Content: 3D GLOBE + GOLD ARROW */}
+            {/* Right Content: STATIC LOGO WITH PREMIUM EFFECTS */}
             <div className="relative w-full h-full min-h-[400px] lg:min-h-[700px] flex items-center justify-center lg:justify-end z-10 -ml-4 lg:ml-0">
-               <WitterCustomLogo3D />
+              <ScrollReveal animation="fade-in-up" delay={200}>
+                <div className="relative group perspective-1000">
+                  <div className="absolute inset-0 bg-gold-500/20 rounded-full blur-[80px] group-hover:bg-gold-400/30 transition-all duration-700 ease-out" />
+                  <Image
+                    src="/assets/witter-global-logo.png"
+                    alt="Witter Global Executive Logo"
+                    width={600}
+                    height={600}
+                    className="relative z-10 w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[500px] drop-shadow-[0_10px_40px_rgba(212,175,55,0.4)] transition-transform duration-700 ease-out group-hover:scale-105 group-hover:drop-shadow-[0_20px_50px_rgba(212,175,55,0.6)]"
+                    priority
+                  />
+                  <div className="absolute inset-x-12 -bottom-10 h-6 bg-black/60 blur-[20px] rounded-[100%] transition-opacity duration-700 group-hover:opacity-100" />
+                </div>
+              </ScrollReveal>
             </div>
           </div>
         </div>
@@ -164,20 +173,24 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
             {[
               {
-                title: "Professional & Reliable Service",
-                body: "Experienced guidance delivered with the consistency and accountability your business deserves.",
+                title: "Professional & Structured Approach",
+                body: "We implement proven systems that bring clarity, organization, and efficiency to business operations.",
               },
               {
-                title: "Scalable Solutions for Growing Businesses",
-                body: "Strategies and systems designed to grow alongside your company at every stage.",
+                title: "Scalable Solutions",
+                body: "Our strategies are designed to grow with your business, supporting both current needs and future expansion.",
               },
               {
-                title: "Focused on Efficiency & Performance",
-                body: "We identify what's holding you back and put smarter, leaner processes in place.",
+                title: "Operational Expertise",
+                body: "We focus on improving the core functions that drive performance and profitability.",
               },
               {
-                title: "Committed to Long-Term Client Success",
-                body: "Real partnerships built on sustainable results, not short-term wins.",
+                title: "Reliable Partnership",
+                body: "We work closely with our clients, providing consistent support and long-term value.",
+              },
+              {
+                title: "Results-Driven Execution",
+                body: "Our approach is centered on measurable improvements and sustainable outcomes.",
               },
             ].map((item, idx) => (
               <ScrollReveal
@@ -198,6 +211,98 @@ export default function HomePage() {
                 </div>
               </ScrollReveal>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════ HOW WE WORK ═══════════════════ */}
+      <section id="process" className="section-spacing bg-navy relative z-20 overflow-hidden">
+        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-navy-900 to-navy z-0" />
+        <div className="content-width section-padding relative z-10">
+          <div className="text-center mb-16">
+            <div className="gold-rule-center mb-6" />
+            <h2 className="font-heading font-semibold text-display-sm text-white mb-4 drop-shadow-md">
+              Our Process
+            </h2>
+            <p className="text-body-lg text-white/70 max-w-xl mx-auto font-light">
+              We employ a structured, methodical approach to elevate your business operations.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+            {/* Desktop connector line */}
+            <div className="hidden md:block absolute top-[44px] left-12 right-12 h-[2px] bg-gradient-to-r from-transparent via-gold-500/30 to-transparent z-0" />
+
+            {[
+              { num: "1", title: "Assessment", desc: "We evaluate current operations, structure, and growth opportunities." },
+              { num: "2", title: "Strategy", desc: "We develop a customized plan to improve efficiency and scalability." },
+              { num: "3", title: "Implementation", desc: "We execute systems and processes designed to optimize performance." },
+              { num: "4", title: "Optimization", desc: "We continuously refine operations to ensure long-term success." },
+            ].map((step, idx) => (
+              <ScrollReveal key={step.num} delay={100 * (idx + 1)} animation="fade-in-up" className="relative z-10">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-24 h-24 rounded-full bg-navy-800 border-2 border-gold-500/50 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(212,175,55,0.15)] bg-gradient-to-br from-navy-800 to-navy-900">
+                    <span className="text-gold-400 font-heading text-3xl font-bold">{step.num}</span>
+                  </div>
+                  <h3 className="font-heading text-xl font-bold text-white mb-3 tracking-wide">{step.title}</h3>
+                  <p className="text-white/60 font-light leading-relaxed">{step.desc}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════ AUTHORITY POSITIONING (WHO WE WORK WITH) ═══════════════════ */}
+      <section className="section-spacing bg-[#faf8f5] relative border-y border-navy-50">
+        <div className="content-width section-padding">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <ScrollReveal animation="fade-in-right">
+              <div>
+                <div className="inline-flex items-center gap-2 mb-6 text-gold-600 uppercase tracking-widest text-sm font-bold">
+                  <span className="w-8 h-[2px] bg-gold-400" />
+                  Who We Work With
+                </div>
+                <h2 className="font-heading font-semibold text-display-sm sm:text-4xl text-navy mb-6 leading-tight">
+                  Why Businesses<br />
+                  <span className="text-gold-600">Work With Us</span>
+                </h2>
+                <p className="text-body-lg text-navy-500 leading-relaxed mb-8">
+                  Witter Global supports a portfolio of businesses across multiple industries, providing centralized management and operational infrastructure.
+                </p>
+                
+                <ul className="space-y-4">
+                  {[
+                    "Structured operational systems",
+                    "Scalable growth strategies",
+                    "Centralized management approach",
+                    "Long-term partnership focus"
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-4 text-navy-700 font-medium bg-white px-5 py-4 rounded-xl shadow-sm border border-navy-50/50">
+                      <div className="w-6 h-6 rounded-full bg-gold-100/50 flex items-center justify-center shrink-0">
+                        <CheckIcon />
+                      </div>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </ScrollReveal>
+            
+            <ScrollReveal animation="fade-in-left" delay={200}>
+              <div className="relative rounded-3xl overflow-hidden aspect-square lg:aspect-[4/5] bg-navy shadow-2xl flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-tr from-navy-900 to-navy-700" />
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80')] mix-blend-overlay opacity-30 bg-cover bg-center" />
+                <div className="w-full h-full absolute inset-0 bg-gold-500/10 mix-blend-color-burn" />
+                
+                {/* Decorative overlay graphic */}
+                <div className="relative z-10 w-32 h-32 border border-gold-500/30 rounded-full flex items-center justify-center backdrop-blur-sm bg-white/5">
+                  <div className="w-24 h-24 border border-gold-500/50 rounded-full flex items-center justify-center animate-spin-slow">
+                    <div className="w-3 h-3 bg-gold-400 rounded-full absolute -top-1.5" />
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
